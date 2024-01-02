@@ -21,14 +21,3 @@ udp:
   listen_port: 54321
   timeout: 30
   fps_hardlimit: 30
-
-
-# Web server config (might be moved to a separate file in the future)
-web:
-  listen_ip: 127.0.0.1
-  listen_port: 5000
-  sql_db: sqlite:///database.db
-  admin_username: admin
-  admin_password: password
-  secret_key: top-secret
-  preview_key: top-secret

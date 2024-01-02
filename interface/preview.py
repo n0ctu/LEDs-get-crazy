@@ -4,8 +4,8 @@ import json
 class Preview:
     def __init__ (self, config):
         self.config = config.config
-        self.width = config.total_canvas_width
-        self.height = config.total_canvas_height
+        self.width = config.config['totals']['canvas_width']
+        self.height = config.config['totals']['canvas_height']
 
     def update(self, rgb_array):
         # Send array of rgb tuples to http server as json
