@@ -5,6 +5,7 @@ import json
 from text import Text
 from preview import Preview
 from canvas import Canvas
+import traceback
 
 from utils import bytes_to_rgb
 
@@ -62,7 +63,8 @@ class Interface:
                 current_time = time.time()
                 if current_time - last_process_time >= min_interval:
                     #update_leds(canvas, data)
-                    self.rgb_data = bytes_to_rgb(data)
+                    #self.rgb_data = bytes_to_rgb(data)
+                    canvas.update(data)
                     #self.preview.update(self.rgb_data)
                     last_process_time = current_time
                     counter += 1
@@ -79,4 +81,5 @@ class Interface:
             except Exception as e:
                 #status("ERROR: " + str(e), "error x_x" + str(e), "red")
                 print("ERROR: " + str(e))
+                traceback.print_exc()
                 break

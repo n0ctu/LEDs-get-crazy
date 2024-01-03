@@ -1,5 +1,5 @@
 import board
-import neopixel
+import neopixel_write, digitalio
 
 # Check if the current platform is supported
 try:
@@ -7,44 +7,69 @@ try:
 except:
     print("WARNING: The UDP interface requires a Raspberry Pi or similar device with GPIO pins. Development/Preview mode only (no board/no neopixel).")
 
+class Section:
+    def __init__(self, pin, section_width, section_height, brightness=1.0, pixel_order='GRB'):
+        self.pin = self._init_pin(pin)
+        self.section_width = section_width
+        self.section_height = section_height
+        self.num_pixels = section_width * section_height
+        self.brightness = brightness
+        self.pixel_order = pixel_order
+    
+    def _init_pin(self, pin):
+        return digitalio.DigitalInOut(getattr(board, pin))
+
+    def write(self, byte_array):
+        '''
+        To-Do:
+         Restructure the data to match the layout of the section
+         Calculate the brightness
+         Change color order if GRB
+         Reverse the whole data if true
+         Rotate the whole data if true
+        '''
+
+        # Send the data to the LED matrix
+        neopixel_write.neopixel_write(self.pin, byte_array)
+
+
 class Canvas:
     def __init__(self, config):
-        self.config = config.config
+        self.config = config
         self.sections = self.init_sections()
         
     def init_sections(self):
-        sections = {}
-        # Initialize each section with a NeoPixel object
+        sections = []
+        # Initialize each section as an object
         for row in self.config['leds']['sections_y']:
             for column in row['sections_x']:
-                pin = getattr(board, column['pin'])
-                num_pixels = column['section_width'] * column['section_height']
-                pixel_order = neopixel.GRB if column['pixel_order'] == 'GRB' else neopixel.RGB
-                sections[column['name']] = neopixel.NeoPixel(pin, num_pixels, brightness=column['brightness'], auto_write=column['auto_write'], pixel_order=pixel_order)
+                sections.append(Section(column['pin'], column['section_width'], column['section_height'], column['brightness'], column['pixel_order']))
         return sections
 
-    def update(self, rgb_data):
+    def update(self, byte_array):
+        section_index = 0
         row_y_offset = 0
+        bytes_per_pixel = 3 
+        total_width_in_bytes = self.config['totals']['canvas_width'] * bytes_per_pixel
+
         for row in self.config['leds']['sections_y']:
             max_row_height = 0
             for column in row['sections_x']:
-                start_x = column.get('offset_x', 0)
-                end_x = start_x + column['section_width']
+                start_x = column.get('offset_x', 0) * bytes_per_pixel
+                end_x = (column['section_width']) * bytes_per_pixel
                 start_y = row_y_offset + column.get('offset_y', 0)
                 end_y = start_y + column['section_height']
-                section_data = [rgb_row[start_x:end_x] for rgb_row in rgb_data[start_y:end_y]]
-                
-                # Send the data to the LED matrix
-                self.send_to_matrix(column['name'], section_data)
-                
+
+                # Extract the section data from the byte array
+                section_data = bytearray()
+                for y in range(start_y, end_y):
+                    row_start_index = y * total_width_in_bytes
+                    section_data.extend(byte_array[row_start_index + start_x : row_start_index + start_x + end_x])
+
+                # Send the data to the current section/matrix
+                self.sections[section_index].write(section_data)
+
+                section_index += 1
                 max_row_height = max(max_row_height, column['section_height'])
 
             row_y_offset += max_row_height
-
-    def send_to_matrix(self, section_name, data):
-        matrix = self.sections[section_name]
-        for y, row in enumerate(data):
-            for x, color in enumerate(row):
-                matrix_index = y * len(row) + x
-                matrix[matrix_index] = color
-        matrix.show()
