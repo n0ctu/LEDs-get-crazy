@@ -41,12 +41,12 @@ while true; do
         echo "Dependency installation skipped."
         break
     else
-        echo "Invalid input. Please type 'yes' or 'no'."
+        echo "Invalid input. Please type 'y' or 'n'."
     fi
 done
 
 echo
-echo "Do you want to register the systemd daemon 'ledsgc.service'?"
+echo "Do you want to setup the systemd daemon 'ledsgc.service'?"
 echo "This makes the UDP interface automatically start on boot."
 
 while true; do
@@ -60,7 +60,7 @@ while true; do
         echo "Daemon installation skipped."
         break
     else
-        echo "Invalid input. Please type 'yes' or 'no'."
+        echo "Invalid input. Please type 'y' or 'n'."
     fi
 done
 
