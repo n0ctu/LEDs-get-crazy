@@ -1,8 +1,8 @@
 #!/bin/bash
 
-PROJECT_DIR=$(realpath "$CURRENT_DIR"/..)
+PROJECT_DIR=$(realpath $(realpath $(dirname "$0"))/..)
 
-# Define systemd service files for the interface and web components
+# Systemd daemon 'ledsgc.service'
 INTERFACE_SERVICE="[Unit]
 Description=LEDs-get-crazy UDP interface
 After=network.target
