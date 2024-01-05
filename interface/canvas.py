@@ -57,7 +57,7 @@ class Canvas:
 class Section:
 
     def __init__(self, pin, section_width, section_height, brightness=1.0, pixel_order='GRB', layout_fix=True, layout_reverse=False, layout_rotate=0):
-        self._handle_imports()
+        self._handle_imports(pin)
         self.section_width = section_width
         self.section_height = section_height
         self.num_pixels = section_width * section_height
@@ -68,7 +68,7 @@ class Section:
         self.layout_reverse = layout_reverse
         self.layout_rotate = layout_rotate
     
-    def _handle_imports(self):
+    def _handle_imports(self, pin):
         # Check if the current platform is supported
         try:
             self.board = __import__('board')
