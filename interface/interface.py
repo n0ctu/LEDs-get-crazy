@@ -13,6 +13,7 @@ from utils import bytes_to_rgb
 class Interface:
     def __init__(self, config):
         self.config = config.config
+        self.canvas = Canvas(self.config)
         self.preview = Preview(config)
         self.rgb_data = [(0,0,0)]
         self.ip = self.get_ip()
@@ -24,6 +25,33 @@ class Interface:
         ip = sock_temp.getsockname()[0]
         sock_temp.close()
         return ip
+
+    def status(self, message, onscreen, color):
+        # Init text
+        text = Text()
+        text.set_canvas_width(self.config['totals']['canvas_width'])
+        text.set_canvas_height(self.config['totals']['canvas_height'])
+
+        text.set_background(1, 1, 1)
+        if color == "red":
+            text.set_foreground(20, 0, 0)
+        elif color == "green":
+            text.set_foreground(0, 20, 0)
+        elif color == "white":
+            text.set_foreground(10, 10, 10)
+
+        text.set_font('smol')
+        text.set_offset(1, 1)
+        text.set_text(onscreen)
+        rgb_array = text.output()
+
+        print(message)
+
+        # Unpack array and turn it into a bytearray
+        byte_array = bytearray()
+        for rgb in rgb_array:
+            byte_array.extend(rgb)
+        self.canvas.update(byte_array)
 
     def udp_listener(self):
         # Init listener
@@ -38,10 +66,7 @@ class Interface:
         min_interval = 1 / self.config['udp']['fps_hardlimit']
 
         ipl = self.ip.replace(".", ". ")
-        #status(canvas, "INFO: Web interface IP address is " + ip, "ready ^-^  " + ipl, "green")
-
-        # Initialize the canvas
-        canvas = Canvas(self.config)
+        self.status("INFO: Primary interface IP address is " + self.ip, "ready ^-^   " + ipl, "green")
 
         while True:
             try:
@@ -64,21 +89,19 @@ class Interface:
                 if current_time - last_process_time >= min_interval:
                     #self.rgb_data = bytes_to_rgb(data)
                     #self.preview.update(self.rgb_data)
-                    canvas.update(data)
+                    self.canvas.update(data)
                     last_process_time = current_time
                     counter += 1
                 
                     if counter % 100 == 0:
                         print("INFO: Processed " + str(counter) + " datagrams so far.")
             except KeyboardInterrupt:
-                #status("INFO: Aborted by user interaction.", "aborted by user x_x", "red")
-                print("graceful exit") # to be replaced
+                self.status("INFO: Exited by user interaction.", "exit by user x_x", "red")
                 sys.exit(0)
             except socket.timeout:
-                #status("INFO: No signal received for " + str(self.config['udp']['timeout']) + " seconds.", "no signal ä ", "white")
+                self.status("INFO: No signal received for " + str(self.config['udp']['timeout']) + " seconds.", "no signal ä ", "white")
                 print("INFO: Processed " + str(counter) + " datagrams since listener is active.")
             except Exception as e:
-                #status("ERROR: " + str(e), "error x_x" + str(e), "red")
-                print("ERROR: " + str(e))
+                self.status("ERROR: " + str(e), "error x_x" + str(e), "red")
                 traceback.print_exc()
                 break

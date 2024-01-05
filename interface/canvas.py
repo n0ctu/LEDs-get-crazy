@@ -84,7 +84,6 @@ class Section:
 
     def rotate_bytearray(self, input_bytearray, degrees):
 
-
         # Convert the bytearray into a 2D list
         matrix = []
         for i in range(self.section_height):

@@ -13,12 +13,12 @@ class Text:
         self.set_canvas_width()
         self.set_canvas_height()
         self.num_pixels = self.canvas_width * self.canvas_height
-        self.pixels = [(0, 0, 0, 0)] * self.num_pixels
+        self.pixels = [(0, 0, 0)] * self.num_pixels
 
         # Intermediate steps
-        self.array_text = []           # Array of arrays of 0s and 1s
-        self.array_colored = []        # Array of arrays of RGBW tuples
-        self.array_rgbw = self.pixels  # Array of RGBW tuples, clipped to canvas height
+        self.array_text = []           # List of lists of 0s and 1s
+        self.array_colored = []        # List of lists of RGBW tuples
+        self.array_rgbw = self.pixels  # List of RGBW tuples, clipped to canvas height
 
         self.set_font(font)
         self.set_background()
@@ -47,11 +47,11 @@ class Text:
     def set_canvas_height(self, height=24):
         self.canvas_height = height
 
-    def set_background(self, r=0, g=0, b=0, w=0):
-        self.background = (r, g, b, w)
+    def set_background(self, r=0, g=0, b=0):
+        self.background = (r, g, b)
 
-    def set_foreground(self, r=255, g=255, b=255, w=255):
-        self.foreground = (r, g, b, w)
+    def set_foreground(self, r=255, g=255, b=255):
+        self.foreground = (r, g, b)
 
     def set_offset(self, x=0, y=0):
         self.offset_x = x
@@ -134,10 +134,10 @@ class Text:
     def output(self):
         # text_to_array uses defaults or beforehand specified values
         self.array_text    = self.text_to_array()                   # List of lists of 0s and 1s
-        self.array_colored = self.bool_to_color(self.array_text)    # List of RGBW tuples
-        self.array_rgbw    = self.clip_array(self.array_colored)    # List of RGBW tuples, offset according to v_scroll, clipped to canvas size
+        self.array_colored = self.bool_to_color(self.array_text)    # List of RGB tuples
+        self.array_rgb     = self.clip_array(self.array_colored)    # List of RGB tuples, offset according to v_scroll, clipped to canvas size
 
-        return self.array_rgbw
+        return self.array_rgb
 
 
 if __name__ == "__main__":
