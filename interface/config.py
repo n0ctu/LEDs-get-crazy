@@ -35,7 +35,7 @@ class Config:
             max_width = max(max_width, row_width)
             max_height += row_height
 
-        print("INFO: Total canvas size is {} x {} px".format(max_width, max_height))
+        print("INFO: Total canvas size is w:{} / h:{}".format(max_width, max_height))
 
         self.config['totals'] = {
             'num_pixels': max_width * max_height,

@@ -62,22 +62,21 @@ class Interface:
                 # Process the most recent datagram if the interval has passed
                 current_time = time.time()
                 if current_time - last_process_time >= min_interval:
-                    #update_leds(canvas, data)
                     #self.rgb_data = bytes_to_rgb(data)
-                    canvas.update(data)
                     #self.preview.update(self.rgb_data)
+                    canvas.update(data)
                     last_process_time = current_time
                     counter += 1
                 
                     if counter % 100 == 0:
-                        print("INFO: Received " + str(counter) + " datagrams so far.")
+                        print("INFO: Processed " + str(counter) + " datagrams so far.")
             except KeyboardInterrupt:
                 #status("INFO: Aborted by user interaction.", "aborted by user x_x", "red")
                 print("graceful exit") # to be replaced
                 sys.exit(0)
             except socket.timeout:
                 #status("INFO: No signal received for " + str(self.config['udp']['timeout']) + " seconds.", "no signal ä ", "white")
-                print("INFO: Received " + str(counter) + " datagrams since listener is active.")
+                print("INFO: Processed " + str(counter) + " datagrams since listener is active.")
             except Exception as e:
                 #status("ERROR: " + str(e), "error x_x" + str(e), "red")
                 print("ERROR: " + str(e))
