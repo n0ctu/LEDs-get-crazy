@@ -138,13 +138,3 @@ class Text:
         self.array_rgb     = self.clip_array(self.array_colored)    # List of RGB tuples, offset according to v_scroll, clipped to canvas size
 
         return self.array_rgb
-
-
-if __name__ == "__main__":
-    text = Text()
-    text.set_canvas_width(48)
-    text.set_canvas_height(24)
-    text.set_font('smol')
-    text.set_offset(3, 3)
-    text.set_text("hallo welt")
-    text.output()

@@ -109,7 +109,10 @@ class Section:
         rotated_bytearray = bytearray()
         for i in range(self.section_width):
             for j in range(self.section_height):
-                rotated_bytearray += rotated_matrix[i][j]
+                if degrees == 0 or degrees == 180:
+                    rotated_bytearray += rotated_matrix[j][i]
+                elif degrees == 90 or degrees == 270:
+                    rotated_bytearray += rotated_matrix[i][j]
 
         return rotated_bytearray
         

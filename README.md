@@ -41,3 +41,12 @@ import socket
 sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 sock.sendto(b'\xff\x00\x00\x00\xff\x00\x00\x00\xff', ('127.0.0.1', 54321))
 ```
+
+## To-Do
+
+- [ ] Fix layout_rotate function (canvas.py, Sections class)
+- [ ] Fix the layout_reverse function (canvas.py, Section class)
+- [ ] Add a layout_mirror option (canvas.py, Section class)
+- [ ] Test the yaml configuration options and implement proper error handling or defaults (canvas.py)
+- [ ] Add different fonts for the text renderer (text.py)
+- [ ] Fix permission issues of the system user (only runs as root currently)
