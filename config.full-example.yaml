@@ -1,72 +1,70 @@
-# Collection of LED strips and/or whole matrices
-
 # Sections can either be used to group multiple independently connected LED strips to a matrix or group multiple matrices to a bigger matrix
 #
-# In this example, we will combine two 8x8 matrices consisting of two 4x2 sections each, to a 16x8 matrix
+# In this example, we will combine three 8x4 matrices with one 4x4 matrix, to a 16x8 matrix with two holes
+# Complicated setup, isn't it? Perfect for a full example
 #
-#     col1        col2
-#  +--------+  +--------+
-#  |  row1  |  |  row1  |
-#  +--------+  +--------+
-#  |  row2  |  |  row2  |
-#  +--------+  +--------+
+#     col1          col2
+#  +--------+    +--------+
+#  |  r1c1  |    |  r1c2  |
+#  +--------+    +--------+
+#  +--------+      +----+
+#  |  r2c2  |  off |r2c2| off
+#  +--------+      +----+
 
+# Collection of LED strips and/or whole matrices
 leds:
-  sections_x:
-    - name: col_1
-      sections_y:
+  sections_y:
+    - name: row1
+      sections_x:
 
-        - name: row_1             # Top 4 LED strips of a 8x8 matrix
+        - name: row1_col1       # First 8x4 matrix (top left)
           pin: D18
           brightness: 1           # Reduces the brightness for this section
-          auto_write: false
           pixel_order: GRB 
           layout_fix: true        # true = S-Layout, false = Z-Layout, usually true due to reducing circuit length
           layout_reverse: false   # true = reverse the layout, false = keep the layout
           layout_rotate: 0        # 0 = no rotation, 1 = 90°, 2 = 180°, 3 = 270°
-          canvas_width: 8         # width of the canvas, number of LEDs after rotation
-          canvas_height: 4        # height of the canvas, number of LEDs after rotation
+          section_width: 8        # width of the section, number of LEDs after rotation
+          section_height: 4       # height of the section, number of LEDs after rotation
 
-        - name: row_2             # Lower 4 LED strips of a 8x8 matrix
+        - name: row1_col2       # Second 8x4 matrix (bottom left)
           pin: D19
           brightness: 1           # Reduces the brightness for this section
-          auto_write: false
           pixel_order: GRB 
           layout_fix: true        # true = S-Layout, false = Z-Layout, usually true due to reducing circuit length
           layout_reverse: false   # true = reverse the layout, false = keep the layout
           layout_rotate: 0        # 0 = no rotation, 1 = 90°, 2 = 180°, 3 = 270°
-          canvas_width: 8         # width of the canvas, number of LEDs after rotation
-          canvas_height: 4        # height of the canvas, number of LEDs after rotation
+          section_width: 8        # width of the canvas, number of LEDs after rotation
+          section_height: 4       # height of the canvas, number of LEDs after rotation
 
-    - name: col_2
-      sections_y:
+    - name: row2
+      sections_x:
 
-        - name: row_1             # Top 4 LED strips of a 8x8 matrix
+        - name: row2_col1         # Third 8x4 matrix (top right)
           pin: D20
           brightness: 1           # Reduces the brightness for this section
-          auto_write: false
           pixel_order: GRB 
           layout_fix: true        # true = S-Layout, false = Z-Layout, usually true due to reducing circuit length
           layout_reverse: false   # true = reverse the layout, false = keep the layout
           layout_rotate: 0        # 0 = no rotation, 1 = 90°, 2 = 180°, 3 = 270°
-          canvas_width: 8         # width of the canvas, number of LEDs after rotation
-          canvas_height: 4        # height of the canvas, number of LEDs after rotation
+          section_width: 8        # width of the canvas, number of LEDs after rotation
+          section_height: 4       # height of the canvas, number of LEDs after rotation
 
-        - name: row_2             # Lower 4 LED strips of a 8x8 matrix
+        - name: row2_col2         # Fourth smaller 4x4 matrix (bottom right)
           pin: D21
           brightness: 1           # Reduces the brightness for this section
-          auto_write: false
           pixel_order: GRB 
           layout_fix: true        # true = S-Layout, false = Z-Layout, usually true due to reducing circuit length
           layout_reverse: false   # true = reverse the layout, false = keep the layout
           layout_rotate: 0        # 0 = no rotation, 1 = 90°, 2 = 180°, 3 = 270°
-          canvas_width: 8         # width of the canvas, number of LEDs after rotation
-          canvas_height: 4        # height of the canvas, number of LEDs after rotation
+          offset_x: 2             # Offset the section by 4 LEDs to the right
+          section_width: 4        # width of the canvas, number of LEDs after rotation
+          section_height: 4       # height of the canvas, number of LEDs after rotation
 
 
 # UDP server config
 udp:
-  listen_ip: 127.0.0.1
+  listen_ip: 0.0.0.0
   listen_port: 54321
   timeout: 30
   fps_hardlimit: 30
@@ -74,14 +72,3 @@ udp:
     - "10.200.200.151"
   ip_whitelist:                   # optional: list of IPs to allow (overrides blacklist if set)
     - "10.200.200.156"
-
-
-# Web server config (might be moved to a separate file in the future)
-web:
-  listen_ip: 127.0.0.1
-  listen_port: 5000
-  sql_db: sqlite:///database.db
-  admin_username: admin
-  admin_password: password
-  secret_key: top-secret
-  preview_key: top-secret
