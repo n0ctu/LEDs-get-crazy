@@ -95,6 +95,8 @@ class Interface:
                 
                     if counter % 100 == 0:
                         print("INFO: Processed " + str(counter) + " datagrams so far.")
+                        # Reset the canvas, cleanup
+                        self.canvas = Canvas(self.config)
             except KeyboardInterrupt:
                 self.status("INFO: Exited by user interaction.", "exit by user x_x", "red")
                 sys.exit(0)

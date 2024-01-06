@@ -80,7 +80,9 @@ class Section:
             print("WARNING: The UDP interface requires a Raspberry Pi or similar device with GPIO pins. Development/Preview mode only (no board/no neopixel).")
 
     def _init_pin(self, pin):
-        return self.digitalio.DigitalInOut(getattr(self.board, pin))
+        dpin = self.digitalio.DigitalInOut(getattr(self.board, pin))
+        dpin.direction = self.digitalio.Direction.OUTPUT
+        return dpin
 
     def rotate_bytearray(self, input_bytearray, degrees):
 
@@ -158,8 +160,12 @@ class Section:
                     frame[i*self.bytes_per_pixel:i*self.bytes_per_pixel+3] = bytearray([g, r, b])
 
             # Reverse the layout if needed
+            # EDIT: whoops, this also inverts colors, fixme
             if self.layout_reverse:
                 frame = frame[::-1]
  
             # Send the data to the LED matrix
-            self.neopixel_write.neopixel_write(self.pin, frame)
+            try:
+                self.neopixel_write.neopixel_write(self.pin, frame)
+            except Exception as e:
+                print("ERROR: Failed to write to LED matrix. {}".format(e))
