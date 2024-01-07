@@ -100,8 +100,7 @@ void gpio_write(int pin, int value) {
 // Function to convert nanoseconds to timer ticks
 unsigned long ns_to_ticks(long nanoseconds, long osc_freq) {
     // System timer frequency on Raspberry Pi is typically 1MHz, ARM timer 250 or 500MHz
-    const long timer_freq = 1000000;
-    return (nanoseconds * timer_freq) / 1000000000L;
+    return (nanoseconds * osc_freq) / 1000000000L;
 }
 
 // Function to set up and enable the ARM Timer
@@ -164,21 +163,20 @@ void send_bits(int gpio_pin, long t0h_t1l_ns, long t1h_t0l_ns, const uint8_t* by
     for (int i = 0; i < length; ++i) {
         for (int bit = 0; bit < 8; ++bit) {
             // Determine if the current bit is 0 or 1
-            // ALWAYS SENDS 1 FOR TESTING!!!
-            int value = (bytes[1] >> (7 - bit)) & 1;
+            int value = (bytes[i] >> (7 - bit)) & 1;
 
             gpio_write(gpio_pin, 1); // Set pin high
-            //printf("Sending: %d", value);
+            // printf("Sending: %d", value);
 
             // Apply high time for 0 or 1
             wait_timer_ticks(value ? t1h_ticks : t0h_ticks);
-            //printf(" (high for %ld ticks)", value ? t1h_ticks : t0h_ticks);
+            // printf(" (high for %ld ticks)", value ? t1h_ticks : t0h_ticks);
 
             gpio_write(gpio_pin, 0); // Set pin low
 
             // Apply low time for 0 or 1
             wait_timer_ticks(value ? t0l_ticks : t1l_ticks);
-            //printf(" (low for %ld ticks)\n", value ? t0l_ticks : t1l_ticks);
+            // printf(" (low for %ld ticks)\n", value ? t0l_ticks : t1l_ticks);
         }
     }
 
@@ -193,7 +191,6 @@ int main(void) {
     // Test data for WS2815 (GRB): 4 pixels red, green, blue, white
     uint8_t data[] = {0x00, 0xFF, 0x00, 0xFF, 0x00, 0x00, 0x00, 0x00, 0xFF, 0xFF, 0xFF, 0xFF};
     // send_bits(gpio_pin, T0H/T1L timing in nanoseconds, T1H/T0L timing in nanoseconds, data, length)
-    // send_bits(18, 300, 1090, data, sizeof(data));
-    send_bits(18, 300, 1090, data, 27648);
+    send_bits(18, 300, 1090, data, sizeof(data));
     return 0;
 }
