@@ -13,7 +13,7 @@ The protocol couldn't be simpler. The UDP interface listens on a port (default 5
 
 ## Requirements
 
-- Linux operating system with **systemd** (tested on Raspbian, Debian Bullseye, yet to test on Bookworm)
+- Linux operating system with **systemd** (tested on Raspbian, Bullseye and Bookworm)
 - Python >= 3.7.0
 
 ## Installation
@@ -50,3 +50,4 @@ sock.sendto(b'\xff\x00\x00\x00\xff\x00\x00\x00\xff', ('127.0.0.1', 54321))
 - [ ] Test the yaml configuration options and implement proper error handling or defaults (canvas.py)
 - [ ] Add different fonts for the text renderer (text.py)
 - [ ] Fix permission issues of the system user (only runs as root currently)
+- [ ] Evaluate bitbanging options to replace the Neopixel library
