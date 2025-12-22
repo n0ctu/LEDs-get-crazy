@@ -14,9 +14,20 @@ EOF
 echo
 echo "This script will guide you through the setup of the UDP interface."
 
+allowed_base=0
+case "${PROJECT_DIR}" in
+  /home/*|/opt/*|/srv/*|/server/*|/data/*) allowed_base=1 ;;
+esac
+if [ "${allowed_base}" -ne 1 ]; then
+  echo -e "\033[31mERROR: Installation is not under an allowed base path (/home, /opt, /srv, /server, /data): ${PROJECT_DIR}\033[0m"
+  echo "Please move the project folder to an allowed location and run this script from there again."
+  exit 1
+fi
+
 if [[ "$EUID" -eq 0 && $PROJECT_DIR == /home/* ]]; then 
     echo
-    echo -e "\033[33mWARNING: If this folder is located in your home directory, run this script without 'sudo' or 'su'! This makes sure you will stay the owner of this folder.\033[0m"
+    echo -e "\033[31mERROR: If this folder is located in your home directory, run this script without 'sudo' or 'su'! This makes sure you will still own all files created during setup.\033[0m"
+    exit 1
 fi
 
 if ! command -v sudo &> /dev/null
@@ -27,8 +38,7 @@ then
 fi
 
 echo
-echo "Do you want to install all dependencies, create a dedicated low-privileged user, and secure the installation?"
-echo "This will modify the file permissions for $PROJECT_DIR. Is this the right folder?"
+echo "This will install missing dependencies and applies changes to $PROJECT_DIR. Is this the right folder?"
 
 while true; do
     read -p "Type 'y' to continue, or 'n' to skip: " user_choice
@@ -47,7 +57,7 @@ done
 
 echo
 echo "Do you want to setup the systemd daemon 'ledsgc.service'?"
-echo "This makes the UDP interface automatically start on boot."
+echo "This makes the UDP interface automatically start on boot and run in the background."
 
 while true; do
     read -p "Type 'y' to install, or 'n' to skip: " user_choice
