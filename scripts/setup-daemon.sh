@@ -9,9 +9,9 @@ After=network.target
 
 [Service]
 Type=simple
-User=ledsgc
-Group=ledsgc
-ExecStart=$($PROJECT_DIR)/start-interface.sh
+User=root
+Group=root
+ExecStart=${PROJECT_DIR}/start-interface.sh
 Restart=always
 RestartSec=10
 
