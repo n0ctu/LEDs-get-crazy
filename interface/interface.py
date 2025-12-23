@@ -3,19 +3,13 @@ import time
 import socket
 import json
 from text import Text
-from preview import Preview
 from canvas import Canvas
 import traceback
-
-from utils import bytes_to_rgb
-
 
 class Interface:
     def __init__(self, config):
         self.config = config.config
         self.canvas = Canvas(self.config)
-        self.preview = Preview(config)
-        self.rgb_data = [(0,0,0)]
         self.ip = self.get_ip()
 
     def get_ip(self):
@@ -26,26 +20,26 @@ class Interface:
         sock_temp.close()
         return ip
 
-    def status(self, message, onscreen, color):
+    def status(self, console_msg, screen_msg, screen_color):
         # Init text
         text = Text()
         text.set_canvas_width(self.config['totals']['canvas_width'])
         text.set_canvas_height(self.config['totals']['canvas_height'])
 
-        text.set_background(1, 1, 1)
-        if color == "red":
+        text.set_background(0, 0, 0)
+        if screen_color == "red":
             text.set_foreground(20, 0, 0)
-        elif color == "green":
+        elif screen_color == "green":
             text.set_foreground(0, 20, 0)
-        elif color == "white":
+        elif screen_color == "white":
             text.set_foreground(10, 10, 10)
 
         text.set_font('smol')
         text.set_offset(1, 1)
-        text.set_text(onscreen)
+        text.set_text(screen_msg)
         rgb_array = text.output()
 
-        print(message)
+        print(console_msg)
 
         # Unpack array and turn it into a bytearray
         byte_array = bytearray()
@@ -58,7 +52,6 @@ class Interface:
         sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         server_address = (self.config['udp']['listen_ip'], self.config['udp']['listen_port'])
         sock.bind(server_address)
-        #sock.settimeout(self.config['udp']['timeout'])
         print('INFO: Listen on {} UDP port {}'.format(*server_address))
 
         counter = 0
@@ -87,16 +80,15 @@ class Interface:
                 # Process the most recent datagram if the interval has passed
                 current_time = time.time()
                 if current_time - last_process_time >= min_interval:
-                    #self.rgb_data = bytes_to_rgb(data)
-                    #self.preview.update(self.rgb_data)
+                    if counter % 100 == 0:
+                        print("INFO: Processed " + str(counter) + " datagrams so far.")
+                        # Recreate canvas to avoid memory leaks over long runtimes
+                        self.canvas = Canvas(self.config)
+
                     self.canvas.update(data)
                     last_process_time = current_time
                     counter += 1
-                
-                    if counter % 100 == 0:
-                        print("INFO: Processed " + str(counter) + " datagrams so far.")
-                        # Reset the canvas, cleanup
-                        self.canvas = Canvas(self.config)
+
             except KeyboardInterrupt:
                 self.status("INFO: Exited by user interaction.", "exit by user x_x", "red")
                 sys.exit(0)

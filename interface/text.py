@@ -1,8 +1,3 @@
-'''
-A cannibalized version of the textgen-plugin I wrote. I decided to make a basic version for on-screen status updates.
-This code shouldn't be changed for experiments, in order not to break status messages and kill the interface.
-'''
-
 import os, time
 import json
 
