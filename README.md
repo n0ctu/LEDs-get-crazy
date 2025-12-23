@@ -1,26 +1,27 @@
 # LEDs-get-crazy
-A Python program for Raspberry Pi and other SBCs to easily manage and interact with LED strips or LED matrices locally or over a network, configurable using yaml.
+A tiny python program for Raspberry Pi and other SBCs to easily manage and interact with LED strips or LED matrices locally or over a network, configurable using yaml.
 
 ## Idea/Concept
 
-This repository is the heart of the project as it contains a UDP/Neopixel interface that provides a neat abstraction between the hardware (or the Neopixel library) and various other software components.
+This is a minimalistic UDP/Neopixel interface that allows other programs or devices to control LED strips/matrices by simply sending byte arrays over UDP.
 
-It can be used to manage one or more LED strips or LED matrices and patch them together to create a single, bigger canvas. But you can use it with a single LED strip or matrix as well. Other programs then just need to know about the simple protocol and about the total size of the canvas to interact with the LEDs. It supports rate limiting and automatic buffer-flushing to reduce the load on the SBC even when there's a lot of traffic incoming (\*cough\* at a hacker conference, for example).
+Additionally, it can be used to manage one or more LED strips or LED matrices and patch them together to create a single, bigger canvas. Other programs only need to know about the the total size of the canvas to interact with the LEDs. It does some rate limiting and automatic buffer-flushing to reduce the load on the SBC even when there's a lot of traffic incoming (\*cough\* at a hacker conference, for example).
 
 ### Protocol
 
-The protocol couldn't be simpler. The UDP interface listens on a port (default 54321) and expects byte arrays. Each three bytes represent a single pixel (RGB). To illuminate the first pixel in red, simply send a UDP datagram consisting of `\xff\x00\x00`.
+The protocol is really simple. The UDP interface listens on a port (default 54321) and waits for datagrams consisting of byte arrays. Each three bytes represent a single pixel (RGB). To illuminate the first pixel in red, simply send a UDP datagram consisting of `\xff\x00\x00`. Send more bytes to illuminate more pixels.
 
 ## Requirements
 
-- Linux operating system with **systemd** (tested on Raspbian, Bullseye and Bookworm)
-- Python >= 3.7.0
+- Tested on Raspberry Pi 4 Model B
+- Linux operating system with systemd (tested on Raspbian, Bullseye, Bookworm and Trixie)
+- Tested with Python >= 3.7.0
 
 ## Installation
 
 1. Customize `config.yaml` to your needs. The file contains a few comments to help you get started. Also there's a fully-fledged example in `config.full-example.yaml`.
-2. Simply run `sudo ./setup-systemd.sh` to install all the requirements needed and setup the systemd service.
-3. The service will immediately be started if the configuration is valid. You can check the status using `systemctl status ledsgc`.
+2. Simply run `./setup.sh` (no sudo) to install all the requirements needed and optionally setup a systemd service when asked.
+3. The service will immediately be started if the configuration is valid. You can check the status using `systemctl status ledsgc`. If you didn't setup a systemd service, simply run `sudo ./start-interface.sh` to start the program.
 4. Send some UDP data to `127.0.0.1:54321`!
 
 ## Usage
@@ -42,12 +43,12 @@ sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 sock.sendto(b'\xff\x00\x00\x00\xff\x00\x00\x00\xff', ('127.0.0.1', 54321))
 ```
 
-## To-Do
+## To-Do / Known Issues
 
 - [ ] Fix layout_rotate function (canvas.py, Sections class)
 - [ ] Fix the layout_reverse function (canvas.py, Section class)
 - [ ] Add a layout_mirror option (canvas.py, Section class)
-- [ ] Test the yaml configuration options and implement proper error handling or defaults (canvas.py)
-- [ ] Add different fonts for the text renderer (text.py)
-- [ ] Fix permission issues of the system user (only runs as root currently)
-- [ ] Evaluate bitbanging options to replace the Neopixel library
+- [ ] Validation of the yaml configuration, proper error handling and defaults (config.py)
+- [ ] Improve text generation (hard breaks) and handling of unknown characters (text.py)
+- [ ] Better reset handling instead of trusting the python garbage collector (interface.py)
+- ~~[ ] Fix permission issues of the system user (only runs as root currently)~~ wont fix, not possible when using rpi_ws281x lib with DMA
